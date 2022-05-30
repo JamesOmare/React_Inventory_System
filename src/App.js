@@ -20,9 +20,34 @@ function App() {
     const [data, setData] = useState({ items: [] });
     const [showTest, setshowTest] = useState(true)
 
+
+    useEffect(() => {
+        fetch("http://localhost:3000/items")
+            .then((response) => {
+                const data = response.json()
+                setData({items : data})
+            })
+    }, [])
+
     const updateFilters = (searchParams) => {
         setFilters(searchParams);
     };
+
+    const deleteItem = (item) => {
+        const items = data['items']
+        const requestoptions = {
+            method: 'DELETE'
+        }
+
+        fetch(`http://localhost:3000/items/${item.id}`, requestoptions)
+            .then((response) => {
+                if(response.ok){
+                    const idx = items.indexOf(item)
+                    items.splice(idx)
+                    setData({ items: items})
+                }
+            })
+    }
 
     //video 7, 6:20
     const addItemToData = (item) => {
@@ -43,14 +68,14 @@ function App() {
                 setData({ items: items });
                 
             })
-            .then((data) => {
+            // .then((data) => {
 
-                // items.push(data);
-                // setData({ items: items });
+            //     // items.push(data);
+            //     // setData({ items: items });
                 
-                // items.push(data)
-                // setData({ items: items})
-            })
+            //     // items.push(data)
+            //     // setData({ items: items})
+            // })
             .catch(err => alert("Failed to add new item, please try again!", err))
            
 
@@ -95,7 +120,10 @@ function App() {
             {/* <Title>test</Title>
       <Title2 color='red'>test2</Title2> */}
             <div className="row mt-3">
-                <ItemsDisplay items={filterData(data["items"])} />
+                <ItemsDisplay
+                deleteItem = {deleteItem} 
+                items={filterData(data["items"])}
+                 />
             </div>
             <div className="row mt-3">
                 <SearchBar updateSearchParams={updateFilters} />
